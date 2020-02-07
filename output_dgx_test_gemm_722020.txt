@@ -1,0 +1,137 @@
+
+julia> a = cu(rand(2,2))
+2×2 CuArray{Float32,2,Nothing}:
+ 0.983238  0.726269
+ 0.744853  0.825094
+
+julia> b = cu(rand(2,2))
+2×2 CuArray{Float32,2,Nothing}:
+ 0.421871  0.391981
+ 0.951975  0.242418
+
+julia> c = cu(rand(2,2))
+2×2 CuArray{Float32,2,Nothing}:
+ 0.722136  0.611036
+ 0.754526  0.925831
+
+julia> CuArrays.CUBLAS.gemm_wrapper!(c,'N','N',a,b)
+2×2 CuArray{Float32,2,Nothing}:
+ 1.10619  0.561472
+ 1.0997   0.491986
+
+julia> CuArrays.CUBLAS.gemm_wrapper!(c,'N','T',a,b)
+2×2 CuArray{Float32,2,Nothing}:
+ 0.699483  1.11208
+ 0.637653  0.9091
+
+julia> a = cu(rand(2,2))
+2×2 CuArray{Float32,2,Nothing}:
+ 0.365737  0.838737
+ 0.547726  0.087503
+
+julia> b = cu(rand(2,4))
+2×4 CuArray{Float32,2,Nothing}:
+ 0.60776    0.701606  0.992032  0.48986
+ 0.0283945  0.387613  0.976812  0.319252
+
+julia> c = cu(rand(2,4))
+2×4 CuArray{Float32,2,Nothing}:
+ 0.472419  0.661004  0.488398  0.106189
+ 0.970005  0.740669  0.246763  0.0401905
+
+julia> b = cu(rand(4,2))
+4×2 CuArray{Float32,2,Nothing}:
+ 0.375733   0.277423
+ 0.39623    0.346549
+ 0.19295    0.0664999
+ 0.0515358  0.365
+
+julia> CuArrays.CUBLAS.gemm_wrapper!(c,'N','N',a,b)
+ERROR: DimensionMismatch("A has dimensions (2,2) but B has dimensions (4,2)")
+Stacktrace:
+ [1] gemm_wrapper!(::CuArray{Float32,2,Nothing}, ::Char, ::Char, ::CuArray{Float32,2,Nothing}, ::CuArray{Float32,2,Nothing}, ::Float32, ::Float32) at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/blas/linalg.jl:141
+ [2] gemm_wrapper!(::CuArray{Float32,2,Nothing}, ::Char, ::Char, ::CuArray{Float32,2,Nothing}, ::CuArray{Float32,2,Nothing}) at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/blas/linalg.jl:137
+ [3] top-level scope at REPL[15]:1
+
+julia> CuArrays.CUBLAS.gemm_wrapper!(c,'N','T',a,b)
+2×4 CuArray{Float32,2,Nothing}:
+ 0.370105  0.43558  0.126345  0.324988
+ 0.230074  0.24735  0.111503  0.0601661
+
+julia> b = CuMatrix(rand(4,2))
+4×2 CuArray{Float64,2,Nothing}:
+ 0.0564815  0.225241
+ 0.0845692  0.266052
+ 0.258809   0.156041
+ 0.543541   0.579532
+
+julia> a = CuMatrix(rand(2,2))
+2×2 CuArray{Float64,2,Nothing}:
+ 0.259394  0.288851
+ 0.389708  0.614984
+
+julia> c = CuMatrix(rand(2,4))
+2×4 CuArray{Float64,2,Nothing}:
+ 0.769558  0.697306  0.498116   0.406227
+ 0.60101   0.464973  0.0647709  0.962777
+
+julia> CuArrays.CUBLAS.gemm_wrapper!(c,'N','T',a,b)
+2×4 CuArray{Float64,2,Nothing}:
+ 0.0797121  0.0987863  0.112206  0.30839
+ 0.160531   0.196575   0.196823  0.568225
+
+julia> c = CuMatrix{Float32}(rand(2,4))
+2×4 CuArray{Float32,2,Nothing}:
+ 0.469076  0.396837  0.718273  0.696436
+ 0.971429  0.716541  0.387897  0.601345
+
+julia> d_M = CuSparseMatrixCSC(rand(2,2))
+ERROR: UndefVarError: CuSparseMatrixCSC not defined
+Stacktrace:
+ [1] top-level scope at REPL[22]:1
+
+julia> d_M = CUSPARSE.CuSparseMatrixCSC(rand(2,2))
+ERROR: MethodError: no method matching CuArrays.CUSPARSE.CuSparseMatrixCSC(::Array{Float64,2})
+Closest candidates are:
+  CuArrays.CUSPARSE.CuSparseMatrixCSC(::SparseArrays.SparseMatrixCSC) at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/sparse/array.jl:219
+  CuArrays.CUSPARSE.CuSparseMatrixCSC(::Array{Ti,1}, ::Array{Ti,1}, ::Array{T,1}, ::Tuple{Int64,Int64}) where {T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}, Ti<:Integer} at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/sparse/array.jl:207
+  CuArrays.CUSPARSE.CuSparseMatrixCSC(::CuArray{Ti,N,P} where P where N, ::CuArray{Ti,N,P} where P where N, ::CuArray{T,N,P} where P where N, ::Tuple{Int64,Int64}) where {T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}, Ti<:Integer} at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/sparse/array.jl:208
+  ...
+Stacktrace:
+ [1] top-level scope at REPL[23]:1
+
+julia> d_M = CUSPARSE.CuSparseMatrixCSC()
+ERROR: MethodError: no method matching CuArrays.CUSPARSE.CuSparseMatrixCSC()
+Closest candidates are:
+  CuArrays.CUSPARSE.CuSparseMatrixCSC(::SparseArrays.SparseMatrixCSC) at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/sparse/array.jl:219
+  CuArrays.CUSPARSE.CuSparseMatrixCSC(::Array{Ti,1}, ::Array{Ti,1}, ::Array{T,1}, ::Tuple{Int64,Int64}) where {T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}, Ti<:Integer} at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/sparse/array.jl:207
+  CuArrays.CUSPARSE.CuSparseMatrixCSC(::CuArray{Ti,N,P} where P where N, ::CuArray{Ti,N,P} where P where N, ::CuArray{T,N,P} where P where N, ::Tuple{Int64,Int64}) where {T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}, Ti<:Integer} at /home/carvalerio/.julia/packages/CuArrays/rNxse/src/sparse/array.jl:208
+  ...
+Stacktrace:
+ [1] top-level scope at REPL[24]:1
+
+julia> d_M = CUSPARSE.CuSparseMatrixCSC
+CuArrays.CUSPARSE.CuSparseMatrixCSC
+
+julia> d_M
+CuArrays.CUSPARSE.CuSparseMatrixCSC
+
+julia> sparse
+ERROR: UndefVarError: sparse not defined
+
+julia> using SparseArrays
+
+julia> sparse(2,2)
+ERROR: MethodError: no method matching sparse(::Int64, ::Int64)
+Closest candidates are:
+  sparse(::Any, ::Any, ::Number) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/SparseArrays/src/sparsematrix.jl:843
+  sparse(::Any, ::Any, ::AbstractArray{Bool,1}, ::Any, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/SparseArrays/src/sparsematrix.jl:851
+  sparse(::Any, ::Any, ::AbstractArray{T,1} where T) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/SparseArrays/src/sparsematrix.jl:845
+  ...
+Stacktrace:
+ [1] top-level scope at REPL[29]:1
+
+julia> sparse([1,2],[3,4],[10,20])
+2×4 SparseMatrixCSC{Int64,Int64} with 2 stored entries:
+  [1, 3]  =  10
+  [2, 4]  =  20
