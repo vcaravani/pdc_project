@@ -1,0 +1,201 @@
+julia> aa = cu(rand(2,2))
+2×2 CuArray{Float32,2,Nothing}:
+ 0.902005  0.389826
+ 0.187103  0.784931
+
+julia> bb = cu((rand(2,2))
+
+
+ERROR: syntax: incomplete: premature end of input
+Stacktrace:
+ [1] top-level scope at REPL[28]:0
+
+julia> bb = cu((rand(2,2)))
+2×2 CuArray{Float32,2,Nothing}:
+ 0.51768    0.257679
+ 0.0953973  0.836892
+
+julia> c
+2×2 CuSparseMatrixCSC{Float32}:
+Error showing value of type CuSparseMatrixCSC{Float32}:
+ERROR: getindex not defined for CuSparseMatrixCSC{Float32}
+Stacktrace:
+ [1] error(::String, ::Type) at ./error.jl:42
+ [2] error_if_canonical_getindex(::IndexCartesian, ::CuSparseMatrixCSC{Float32}, ::Int64, ::Int64) at ./abstractarray.jl:991
+ [3] getindex at ./abstractarray.jl:980 [inlined]
+ [4] isassigned(::CuSparseMatrixCSC{Float32}, ::Int64, ::Int64) at ./abstractarray.jl:405
+ [5] alignment(::IOContext{REPL.Terminals.TTYTerminal}, ::CuSparseMatrixCSC{Float32}, ::UnitRange{Int64}, ::UnitRange{Int64}, ::Int64, ::Int64, ::Int64) at ./arrayshow.jl:67
+ [6] print_matrix(::IOContext{REPL.Terminals.TTYTerminal}, ::CuSparseMatrixCSC{Float32}, ::String, ::String, ::String, ::String, ::String, ::String, ::Int64, ::Int64) at ./arrayshow.jl:186
+ [7] print_matrix at ./arrayshow.jl:159 [inlined]
+ [8] print_array at ./arrayshow.jl:308 [inlined]
+ [9] show(::IOContext{REPL.Terminals.TTYTerminal}, ::MIME{Symbol("text/plain")}, ::CuSparseMatrixCSC{Float32}) at ./arrayshow.jl:345
+ [10] display(::REPL.REPLDisplay, ::MIME{Symbol("text/plain")}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/REPL.jl:132
+ [11] display(::REPL.REPLDisplay, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/REPL.jl:136
+ [12] display(::Any) at ./multimedia.jl:323
+ [13] #invokelatest#1 at ./essentials.jl:709 [inlined]
+ [14] invokelatest at ./essentials.jl:708 [inlined]
+ [15] print_response(::IO, ::Any, ::Bool, ::Bool, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/REPL.jl:156
+ [16] print_response(::REPL.AbstractREPL, ::Any, ::Bool, ::Bool) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/REPL.jl:141
+ [17] (::REPL.var"#do_respond#38"{Bool,REPL.var"#48#57"{REPL.LineEditREPL,REPL.REPLHistoryProvider},REPL.LineEditREPL,REPL.LineEdit.Prompt})(::Any, ::Any, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/REPL.jl:719
+ [18] #invokelatest#1 at ./essentials.jl:709 [inlined]
+ [19] invokelatest at ./essentials.jl:708 [inlined]
+ [20] run_interface(::REPL.Terminals.TextTerminal, ::REPL.LineEdit.ModalInterface, ::REPL.LineEdit.MIState) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/LineEdit.jl:2306
+ [21] run_frontend(::REPL.LineEditREPL, ::REPL.REPLBackendRef) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/REPL.jl:1045
+ [22] run_repl(::REPL.AbstractREPL, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.3/REPL/src/REPL.jl:201
+ [23] (::Base.var"#770#772"{Bool,Bool,Bool,Bool})(::Module) at ./client.jl:382
+ [24] #invokelatest#1 at ./essentials.jl:709 [inlined]
+ [25] invokelatest at ./essentials.jl:708 [inlined]
+ [26] run_main_repl(::Bool, ::Bool, ::Bool, ::Bool, ::Bool) at ./client.jl:366
+ [27] exec_options(::Base.JLOptions) at ./client.jl:304
+ [28] _start() at ./client.jl:460
+
+julia> CUSPARSE.mm('N',c,aa,bb,'O');
+[ Info: Building the CUDAnative run-time library for your sm_60 device, this might take a while...
+[ Info: Building the CUDAnative run-time library for your sm_60 device, this might take a while...
+
+
+julia> print(Matrix(c))
+ERROR: getindex not defined for CuSparseMatrixCSC{Float32}
+Stacktrace:
+ [1] error(::String, ::Type) at ./error.jl:42
+ [2] error_if_canonical_getindex(::IndexCartesian, ::CuSparseMatrixCSC{Float32}, ::Int64, ::Int64) at ./abstractarray.jl:991
+ [3] getindex at ./abstractarray.jl:980 [inlined]
+ [4] _getindex at ./abstractarray.jl:1021 [inlined]
+ [5] getindex at ./abstractarray.jl:981 [inlined]
+ [6] copyto! at ./multidimensional.jl:905 [inlined]
+ [7] Array at ./array.jl:498 [inlined]
+ [8] Array{T,2} where T(::CuSparseMatrixCSC{Float32}) at ./boot.jl:426
+ [9] top-level scope at REPL[33]:1
+
+julia> print(Matrix(collect(c)))
+Float32[0.9903194 0.73345244; 0.07551539 0.04419612]
+julia>
+
+
+
+
+
+
+
+
+julia> CUSPARSE.mm('N',c,a,M_1_cuda,'O')
+ERROR: MethodError: no method matching mm(::Char, ::CuSparseMatrixCSC{Float32}, ::Array{Int64,2}, ::CuSparseMatrixCSC{Float32}, ::Char)
+Closest candidates are:
+  mm(::Char, ::Union{CuSparseMatrixBSR{Float32}, CuSparseMatrixCSC{Float32}, CuSparseMatrixCSR{Float32}, CuSparseMatrixHYB{Float32}}, ::CuArray{Float32,2}, ::CuArray{Float32,2}, ::Char) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\sparse\wrappers.jl:1127
+  mm(::Char, ::Float32, ::Union{CuSparseMatrixBSR{Float32}, CuSparseMatrixCSC{Float32}, CuSparseMatrixCSR{Float32}, CuSparseMatrixHYB{Float32}}, ::CuArray{Float32,2}, ::Char) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\sparse\wrappers.jl:1134
+  mm(::Char, ::Float64, ::Union{CuSparseMatrixBSR{Float64}, CuSparseMatrixCSC{Float64}, CuSparseMatrixCSR{Float64}, CuSparseMatrixHYB{Float64}}, ::CuArray{Float64,2}, ::Char) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\sparse\wrappers.jl:1134
+  ...
+Stacktrace:
+ [1] top-level scope at none:0
+
+julia> CuMatrix(M_1_cuda)
+24×24 CuArray{Float32,2}:
+ 1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ ⋮                        ⋮                        ⋮                        ⋮                        ⋮
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0
+
+julia> CuMatrix(M_1_cuda')
+ERROR: getindex not defined for CuSparseMatrixCSC{Float32}
+Stacktrace:
+ [1] error_if_canonical_getindex(::IndexCartesian, ::CuSparseMatrixCSC{Float32}, ::Int64, ::Int64) at .\abstractarray.jl:991
+ [2] getindex at .\abstractarray.jl:980 [inlined]
+ [3] getindex at D:\buildbot\worker\package_win64\build\usr\share\julia\stdlib\v1.3\LinearAlgebra\src\adjtrans.jl:178 [inlined]
+ [4] _getindex at .\abstractarray.jl:1021 [inlined]
+ [5] getindex at .\abstractarray.jl:981 [inlined]
+ [6] copyto!(::Array{Float32,2}, ::LinearAlgebra.Adjoint{Float32,CuSparseMatrixCSC{Float32}}) at .\multidimensional.jl:905
+ [7] _collect_indices at .\array.jl:578 [inlined]
+ [8] collect at .\array.jl:562 [inlined]
+ [9] CuArray{Float32,2}(::LinearAlgebra.Adjoint{Float32,CuSparseMatrixCSC{Float32}}) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\array.jl:106
+ [10] CuArray{T,2} where T(::LinearAlgebra.Adjoint{Float32,CuSparseMatrixCSC{Float32}}) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\array.jl:115
+ [11] top-level scope at none:0
+
+julia> CuMatrix(M_1_cuda');
+ERROR: getindex not defined for CuSparseMatrixCSC{Float32}
+Stacktrace:
+ [1] error_if_canonical_getindex(::IndexCartesian, ::CuSparseMatrixCSC{Float32}, ::Int64, ::Int64) at .\abstractarray.jl:991
+ [2] getindex at .\abstractarray.jl:980 [inlined]
+ [3] getindex at D:\buildbot\worker\package_win64\build\usr\share\julia\stdlib\v1.3\LinearAlgebra\src\adjtrans.jl:178 [inlined]
+ [4] _getindex at .\abstractarray.jl:1021 [inlined]
+ [5] getindex at .\abstractarray.jl:981 [inlined]
+ [6] copyto!(::Array{Float32,2}, ::LinearAlgebra.Adjoint{Float32,CuSparseMatrixCSC{Float32}}) at .\multidimensional.jl:905
+ [7] _collect_indices at .\array.jl:578 [inlined]
+ [8] collect at .\array.jl:562 [inlined]
+ [9] CuArray{Float32,2}(::LinearAlgebra.Adjoint{Float32,CuSparseMatrixCSC{Float32}}) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\array.jl:106
+ [10] CuArray{T,2} where T(::LinearAlgebra.Adjoint{Float32,CuSparseMatrixCSC{Float32}}) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\array.jl:115
+ [11] top-level scope at none:0
+
+julia> CuMatrix(M_1_cuda)
+24×24 CuArray{Float32,2}:
+ 1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ ⋮                        ⋮                        ⋮                        ⋮                        ⋮
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0
+
+julia> M0 = CuMatrix(M_1_cuda)
+24×24 CuArray{Float32,2}:
+ 1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ ⋮                        ⋮                        ⋮                        ⋮                        ⋮
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0
+
+julia> M1 = CuMatrix(M_1_cuda)
+24×24 CuArray{Float32,2}:
+ 1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ ⋮                        ⋮                        ⋮                        ⋮                        ⋮
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0
+
+julia> CUSPARSE.mm('N',c,M0,M1,'O')
+ERROR: Device capability v2.1.0 not supported by available toolchain
+Stacktrace:
+ [1] supported_capability at C:\Users\Lerry\.julia\packages\CUDAnative\Lr0yj\src\utils.jl:7 [inlined]
+ [2] macro expansion at C:\Users\Lerry\.julia\packages\CUDAnative\Lr0yj\src\execution.jl:388 [inlined]
+ [3] #cufunction#176(::Nothing, ::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::typeof(CUDAnative.cufunction), ::GPUArrays.var"#25#26", ::Type{Tuple{CuArrays.CuKernelState,CUDAnative.CuDeviceArray{Float32,2,CUDAnative.AS.Global},Base.Broadcast.Broadcasted{Nothing,Tuple{Base.OneTo{Int64},Base.OneTo{Int64}},typeof(identity),Tuple{Base.Broadcast.Extruded{CUDAnative.CuDeviceArray{Float32,2,CUDAnative.AS.Global},Tuple{Bool,Bool},Tuple{Int64,Int64}}}}}}) at C:\Users\Lerry\.julia\packages\CUDAnative\Lr0yj\src\execution.jl:357
+ [4] cufunction(::Function, ::Type) at C:\Users\Lerry\.julia\packages\CUDAnative\Lr0yj\src\execution.jl:357
+ [5] macro expansion at C:\Users\Lerry\.julia\packages\CUDAnative\Lr0yj\src\execution.jl:174 [inlined]
+ [6] macro expansion at .\gcutils.jl:91 [inlined]
+ [7] macro expansion at C:\Users\Lerry\.julia\packages\CUDAnative\Lr0yj\src\execution.jl:171 [inlined]
+ [8] _gpu_call(::CuArrays.CuArrayBackend, ::Function, ::CuArray{Float32,2}, ::Tuple{CuArray{Float32,2},Base.Broadcast.Broadcasted{Nothing,Tuple{Base.OneTo{Int64},Base.OneTo{Int64}},typeof(identity),Tuple{Base.Broadcast.Extruded{CuArray{Float32,2},Tuple{Bool,Bool},Tuple{Int64,Int64}}}}}, ::Tuple{Tuple{Int64},Tuple{Int64}}) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\gpuarray_interface.jl:60
+ [9] gpu_call at C:\Users\Lerry\.julia\packages\GPUArrays\tIMl5\src\abstract_gpu_interface.jl:151 [inlined]
+ [10] gpu_call at C:\Users\Lerry\.julia\packages\GPUArrays\tIMl5\src\abstract_gpu_interface.jl:128 [inlined]
+ [11] copyto!(::CuArray{Float32,2}, ::Base.Broadcast.Broadcasted{Nothing,Tuple{Base.OneTo{Int64},Base.OneTo{Int64}},typeof(identity),Tuple{CuArray{Float32,2}}}) at C:\Users\Lerry\.julia\packages\GPUArrays\tIMl5\src\broadcast.jl:48
+ [12] copyto!(::CuArray{Float32,2}, ::Base.Broadcast.Broadcasted{Base.Broadcast.ArrayStyle{CuArray},Tuple{Base.OneTo{Int64},Base.OneTo{Int64}},typeof(identity),Tuple{CuArray{Float32,2}}}) at .\broadcast.jl:863
+ [13] copy(::Base.Broadcast.Broadcasted{Base.Broadcast.ArrayStyle{CuArray},Tuple{Base.OneTo{Int64},Base.OneTo{Int64}},typeof(identity),Tuple{CuArray{Float32,2}}}) at .\broadcast.jl:839
+ [14] materialize(::Base.Broadcast.Broadcasted{Base.Broadcast.ArrayStyle{CuArray},Nothing,typeof(identity),Tuple{CuArray{Float32,2}}}) at .\broadcast.jl:819
+ [15] copy at C:\Users\Lerry\.julia\packages\GPUArrays\tIMl5\src\abstractarray.jl:180 [inlined]
+ [16] mm at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\sparse\wrappers.jl:1112 [inlined]
+ [17] mm(::Char, ::CuSparseMatrixCSC{Float32}, ::CuArray{Float32,2}, ::CuArray{Float32,2}, ::Char) at C:\Users\Lerry\.julia\packages\CuArrays\wXQp8\src\sparse\wrappers.jl:1127
+ [18] top-level scope at none:0
