@@ -1,0 +1,30 @@
+test matrix on gtx
+
+operations:
+1) M0*M1'
+2) M1*M2'
+3) M2*M3'
+
+n,m,k = 3,2,1
+
+SparseMatrix
+1) 2.405 μs (15 allocations: 7.78 KiB)
+2) 8.322 μs (20 allocations: 16.11 KiB)
+3) 2.941 μs (20 allocations: 6.19 KiB)
+
+CuArrays
+1) 6.123 μs (11 allocations: 432 bytes)
+2) 20.361 μs (78 allocations: 2.98 KiB)
+2) 20.556 μs (78 allocations: 2.98 KiB)
+
+n,m,k = 32,16,1
+
+SparseMatrix
+1) 213.752 μs (21 allocations: 314.83 KiB)
+2) 1.089 ms (29 allocations: 1.35 MiB)
+3) 619.410 μs (26 allocations: 826.25 KiB)
+
+CuArrays
+1) 6.149 μs (13 allocations: 464 bytes)
+2) 18.656 μs (82 allocations: 3.05 KiB)
+2) 33.712 μs (82 allocations: 3.05 KiB)

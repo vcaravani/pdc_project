@@ -1,0 +1,32 @@
+test
+
+operations:
+1) M0*M1'
+2) M1*M2'
+3) M2*M3'
+
+n,m,k = 32,16,1
+
+SparseMatrix
+1) 80.199 μs (21 allocations: 314.83 KiB)
+2) 674.400 μs (29 allocations: 1.35 MiB)
+3) 441.301 μs (26 allocations: 826.25 KiB)
+
+CuArrays
+1) 2.878 μs (10 allocations: 448 bytes)
+2) 9.200 μs (76 allocations: 3.03 KiB)
+2) 9.700 μs (76 allocations: 3.03 KiB)
+
+
+
+n,m,k = 32,32,1
+
+SparseMatrix
+1) 167.100 μs (21 allocations: 617.39 KiB)
+2) 1.372 ms (29 allocations: 2.71 MiB)
+3) 889.999 μs (26 allocations: 1.65 MiB)
+
+CuArrays
+1)2.589 μs (10 allocations: 448 bytes)
+2)9.699 μs (76 allocations: 3.03 KiB)
+3)10.100 μs (76 allocations: 3.03 KiB)

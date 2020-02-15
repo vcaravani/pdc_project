@@ -1,0 +1,27 @@
+matrix multiplication with CuArrays
+
+@code_typed M_0_cu* M_1_cu'
+
+CodeInfo(
+1 ─ %1  = Base.getfield(A, :dims)::Tuple{Int64,Int64}
+│   %2  = Base.getfield(%1, 1, true)::Int64
+│   %3  = Base.getfield(B, :parent)::CuArray{Float32,2}
+│   %4  = Base.getfield(%3, :dims)::Tuple{Int64,Int64}
+│   %5  = (getfield)(%4, 1)::Int64
+│   %6  = Core.tuple(%2, %5)::Tuple{Int64,Int64}
+│   %7  = invoke CuArray{Float32,2}(CuArrays.undef::UndefInitializer, %6::Tuple{Int64,Int64})::CuArray{Float32,2}
+│   %8  = Base.getfield(B, :parent)::CuArray{Float32,2}
+│   %9  = CuArrays.CUBLAS.gemm_wrapper!::typeof(CuArrays.CUBLAS.gemm_wrapper!)
+│   %10 = invoke %9(%7::CuArray{Float32,2}, 'N'::Char, 'T'::Char, _2::CuArray{Float32,2}, %8::CuArray{Float32,2}, 1.0f0::Float32, 0.0f0::Float32)::CuArray{Float32,2}
+└──       return %10
+) => CuArray{Float32,2}
+
+
+@code_typed M_0 * M_1'
+CodeInfo(
+1 ─ %1 = Base.getfield(B, :parent)::SparseMatrixCSC{Int64,Int64}
+│   %2 = %new(SparseArrays.:(var"#5#6"))::SparseArrays.var"#5#6"
+│   %3 = invoke SparseArrays.ftranspose(%1::SparseMatrixCSC{Int64,Int64}, %2::Function)::SparseMatrixCSC{Int64,Int64}
+│   %4 = invoke SparseArrays.spmatmul(_2::SparseMatrixCSC{Int64,Int64}, %3::SparseMatrixCSC{Int64,Int64})::SparseMatrixCSC{Int64,Int64}
+└──      return %4
+) => SparseMatrixCSC{Int64,Int64}
