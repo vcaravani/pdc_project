@@ -30,3 +30,19 @@ CuArrays
 1)2.589 μs (10 allocations: 448 bytes)
 2)9.699 μs (76 allocations: 3.03 KiB)
 3)10.100 μs (76 allocations: 3.03 KiB)
+
+
+
+
+
+V,CV = random3cells([20,10,5],4_000)
+
+SparseMatrix
+1)140.399 μs (21 allocations: 433.53 KiB)
+2)1.556 ms (29 allocations: 2.42 MiB)
+3)1.569 ms (26 allocations: 2.09 MiB)
+
+CuArrays
+1)2.388 μs (10 allocations: 448 bytes)
+2)12.001 μs (76 allocations: 3.03 KiB)
+3)9.200 μs (76 allocations: 3.03 KiB)

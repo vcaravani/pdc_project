@@ -28,3 +28,48 @@ CuArrays
 1) 6.149 μs (13 allocations: 464 bytes)
 2) 18.656 μs (82 allocations: 3.05 KiB)
 2) 33.712 μs (82 allocations: 3.05 KiB)
+
+
+
+
+ V,CV = random3cells([40,20,10],4_000)
+
+
+ SparseMatrix
+ 1) 2.078 ms (21 allocations: 2.47 MiB)
+ 2) 12.571 ms (30 allocations: 10.48 MiB)
+ 3) 5.409 ms (29 allocations: 5.02 MiB)
+
+ CuArrays
+ 1)  1.213 ms (11 allocations: 416 bytes)
+ 2)  3.324 ms (87 allocations: 3.09 KiB)
+ 2)  1.534 ms (82 allocations: 2.98 KiB)
+
+
+
+
+
+ V,CV = random3cells([40,20,10],4_000_000)
+
+
+
+ SparseMatrix
+ 1) 2.871 ms (21 allocations: 3.04 MiB)
+ 2) 24.853 ms (30 allocations: 19.23 MiB)
+ 3) 21.889 ms (30 allocations: 18.78 MiB)
+
+ CuArrays
+ 1)  1.453 ms (15 allocations: 480 bytes)
+ 2)  9.741 ms (87 allocations: 3.09 KiB)
+ 2)  2.574 ms (87 allocations: 3.09 KiB)
+
+
+V,CV = random3cells([80,40,20],4_000_000)
+
+SparseMatrix
+1) 30.814 ms (22 allocations: 23.03 MiB)
+2) 238.118 ms (30 allocations: 153.05 MiB)
+3) 227.629 ms (30 allocations: 157.54 MiB)
+
+CuArrays
+OUT OF MEMORY
