@@ -189,15 +189,20 @@ elty = Float32
 
 A = M_1
 B = M_2
-C = A * B
+B2 = M_2' #modificato in trasposto, altrimenti dava DimMism.
+C = A * B2
+
 
 d_A = CuSparseMatrixCSR(A)
 d_B = CuSparseMatrixCSR(B)
-d_C = CUSPARSE.gemm('N','N',d_A,d_B,'O','O','O')
+d_C = CUSPARSE.gemm('N','T',d_A,d_B,'O','O','O') #messa la 'T'
 r_r = collect(d_C.rowPtr)
 r_c = collect(d_C.colVal)
 r_v = collect(d_C.nzVal)
 h_C = collect(d_C)
+
+using Test 
+
 @test C ≈ h_C
 
 
@@ -205,7 +210,7 @@ h_C = collect(d_C)
 
 
 
-
+FV = convert( Array{Array{Int64,1},1}, FV ) #usato per castare, altrimenti lar2cop non funziona
 
 gFV = Lar.lar2cop(FV) 
 
@@ -215,6 +220,7 @@ K1_cpu, K3_gpu = x86_K( CV ), cuda_K( EV )
 K2_cpu, K3_gpu = x86_K( CV ), cuda_K( FV )
 K3_cpu, K3_gpu = x86_K( CV ), cuda_K( CV )
 
+using BenchmarkTools
 
 function benchmark(CV, NN=100)
     K_cpu, K_gpu = x86_K( CV ), cuda_K( CV )
@@ -280,11 +286,14 @@ op ( A ) = A	if transa == CUBLAS_OP_N A; T if transa == CUBLAS_OP_T A; H if tran
 
         A = sparse(rand(elty,m,k))
         B = sparse(rand(elty,k,n))
-        d_A = CuSparseMatrixCSC(A)
-        d_B = CuSparseMatrixCSC(B)
+       #d_A = CuSparseMatrixCSC(A)
+       
+       #d_B = CuSparseMatrixCSC(B)
+       d_B = CuSparseMatrixCSR(B)
+       
         C = A * B
-        d_C = CUSPARSE.gemm('N','N',d_A,d_B,'O','O','O')
-        h_C = collect(d_C)
+        d_C = CUSPARSE.gemm('N','N',d_A,d_B,'O','O','O');
+        h_C = collect(d_C) #torna una CSC anche se operi con CSR
         @test_approx_eq(C,h_C)
 
 
