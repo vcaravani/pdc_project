@@ -1,4 +1,4 @@
-using LinearAlgebraicRepresentation, SparseArrays, DataStructures
+using LinearAlgebraicRepresentation, SparseArrays
 Lar = LinearAlgebraicRepresentation
 
 using CuArrays,CuArrays.CUSPARSE
@@ -78,7 +78,7 @@ k = 1;
 
 V,CV = Lar.cuboidGrid([n,m,k])
 
-V,CV = random3cells([40,20,	10],4_000)
+#V,CV = random3cells([40,20,	10],4_000)
 
 
 VV = [[v] for v=1:size(V,2)]
@@ -127,7 +127,7 @@ function benchmark(n,m,k)
 				M_2 = K(FV)
 				M_3 = K(CV)
 
-				print(typeof(M_0))
+				println(typeof(M_0))
 
 				t1 = Base.@elapsed @btime $M_0 * $M_1'
 				t2 = Base.@elapsed @btime ($M_1 * $M_2') .÷ 2
