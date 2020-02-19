@@ -1,0 +1,32 @@
+'''
+133.771 μs (21 allocations: 366.36 KiB)
+49.671 μs (2 allocations: 32 bytes)
+
+elapsed time (ns): 11039975
+bytes allocated:   12461120
+pool allocs:       17
+malloc() calls:    7
+realloc() calls:   2
+  0.004908 seconds (6 allocations: 192 bytes)
+
+elapsed time (ns): 4907548
+bytes allocated:   192
+pool allocs:       6
+
+
+
+
+
+2.937 μs (15 allocations: 7.78 KiB)
+3.381 μs (2 allocations: 32 bytes)
+133.771 μs (21 allocations: 366.36 KiB)
+49.671 μs (2 allocations: 32 bytes)
+963.753 μs (21 allocations: 2.30 MiB)
+483.015 μs (2 allocations: 32 bytes)
+0.887698 seconds (26 allocations: 218.619 MiB, 8.43% gc time)
+0.356622 seconds (6 allocations: 192 bytes)
+774.199 ms (22 allocations: 218.62 MiB)
+256.647 ms (2 allocations: 32 bytes)
+
+
+'''

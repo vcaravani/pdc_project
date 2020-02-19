@@ -30,6 +30,20 @@ function K_GBLAS( CV )
 	return M
 end
 
+function ZeroBasedIndex2Int(Indices::Array{ZeroBasedIndex,1})
+	I = Int64[]
+
+	for index in Indices
+		index_int = replace(string(index), "ZeroBasedIndex(" => "")
+		index_int = replace(index_int, ")" => "")
+		index_int = replace(index_int, "x" => "")
+		i = parse(Int, index_int, base=16)
+		push!(I,i+1)
+	end
+
+	return I
+end
+
 function collect_matrix_gblas(GBLAS_M)
 
 	n_row = Int64(GrB_Matrix_nrows(GBLAS_M))
@@ -44,25 +58,21 @@ function collect_matrix_gblas(GBLAS_M)
 	GrB_Matrix_extract(OUT, GrB_NULL, GrB_NULL, GBLAS_M, I1, n_row, J1, n_col, GrB_NULL)
 
 	I, J, X = GrB_Matrix_extractTuples(GBLAS_M)
-	print((I))
 
-	#=
-	I =
-	J =
-	X =
-	=#
-	#return sparse(I,J,X)
+	I = ZeroBasedIndex2Int(I)
+	J = ZeroBasedIndex2Int(J)
+
+
+	return sparse(I,J,X)
 end
 
 
-using SuiteSparseGraphBLAS, GraphBLASInterface
+using SuiteSparseGraphBLAS, GraphBLASInterface, Test
 GrB_init(GrB_NONBLOCKING)
 
-using LinearAlgebra
-#Matrix{Float64}(I, 2, 2)
 
 
-V,CV = Lar.cuboidGrid([300,200,10])
+V,CV = Lar.cuboidGrid([3,2,1])
 
 VV = [[v] for v=1:size(V,2)]
 FV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2FV,CV)...))))
@@ -73,11 +83,22 @@ EV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2EV,CV)...))))
 M_0_test = K(VV)
 M_0 = K_GBLAS(VV);
 #@GxB_fprint(M_0, GxB_COMPLETE)
+@test M_0_test == collect_matrix_gblas(M_0)
 
+
+# create M_1
 M_1_test = K(EV)
 M_1 = K_GBLAS(EV);
 #@GxB_fprint(M_1, GxB_COMPLETE)
+@test M_1_test == collect_matrix_gblas(M_1)
 
+# init GrB_Descriptor for mxm
+desc = GrB_Descriptor()
+GrB_Descriptor_new(desc)
+GrB_Descriptor_set(desc, GrB_INP1, GrB_TRAN)
+GrB_Descriptor_set(desc, GrB_OUTP, GrB_REPLACE)
+
+# init sigma_1
 n_row = Int64(GrB_Matrix_nrows(M_0))
 n_col = Int64(GrB_Matrix_nrows(M_1))
 I1 = [i for i=1:n_row-1]
@@ -85,45 +106,29 @@ J1 = [j for j=1:n_col-1]
 x = [1 for i in 1:n_row]
 sigma_1 = GrB_Matrix(ZeroBasedIndex.(I1),ZeroBasedIndex.(J1),x )
 
+# compute sigma_1
+sigma_1_test = M_0_test * M_1_test'
+GrB_mxm(sigma_1, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_0, M_1, desc)
+@test sigma_1_test == collect_matrix_gblas(sigma_1)
 
 
-desc = GrB_Descriptor()
-GrB_Descriptor_new(desc)
-GrB_Descriptor_set(desc, GrB_INP1, GrB_TRAN)
-GrB_Descriptor_set(desc, GrB_OUTP, GrB_REPLACE)
+# create M_1
+M_2_test = K(FV)
+M_2 = K_GBLAS(FV);
+#@GxB_fprint(M_1, GxB_COMPLETE)
+@test M_2_test == collect_matrix_gblas(M_2)
 
-@btime sigma_1_test = M_0_test * M_1_test'
-@btime GrB_mxm(sigma_1, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_0, M_1, desc)
-
-'''
-133.771 μs (21 allocations: 366.36 KiB)
-49.671 μs (2 allocations: 32 bytes)
-
-elapsed time (ns): 11039975
-bytes allocated:   12461120
-pool allocs:       17
-malloc() calls:    7
-realloc() calls:   2
-  0.004908 seconds (6 allocations: 192 bytes)
-
-elapsed time (ns): 4907548
-bytes allocated:   192
-pool allocs:       6
+# init sigma_2
+n_row = Int64(GrB_Matrix_nrows(M_1))
+n_col = Int64(GrB_Matrix_nrows(M_2))
+I1 = [i for i=1:n_row-1]
+J1 = [j for j=1:n_col-1]
+x = [1 for i in 1:n_row]
+sigma_2 = GrB_Matrix(ZeroBasedIndex.(I1),ZeroBasedIndex.(J1),x )
 
 
-
-
-
-2.937 μs (15 allocations: 7.78 KiB)
-3.381 μs (2 allocations: 32 bytes)
-133.771 μs (21 allocations: 366.36 KiB)
-49.671 μs (2 allocations: 32 bytes)
-963.753 μs (21 allocations: 2.30 MiB)
-483.015 μs (2 allocations: 32 bytes)
-0.887698 seconds (26 allocations: 218.619 MiB, 8.43% gc time)
-0.356622 seconds (6 allocations: 192 bytes)
-774.199 ms (22 allocations: 218.62 MiB)
-256.647 ms (2 allocations: 32 bytes)
-
-
-'''
+# compute sigma_2
+sigma_2_test = M_1_test * M_2_test' .÷ 2
+# we need a mask or elementwise operation????
+GrB_mxm(sigma_2, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_1, M_2, desc)
+@test sigma_2_test == collect_matrix_gblas(sigma_2)
