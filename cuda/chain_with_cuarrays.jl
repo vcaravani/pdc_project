@@ -91,9 +91,13 @@ M_1 = K(EV);
 M_2 = K(FV);
 M_3 = K(CV);
 
-@btime sigma_1 =  M_0 * M_1';
-@btime sigma_2 = M_1 * M_2' .÷ 2;
-@btime sigma_3 = M_2 * M_3' .÷ 4;
+sigma_1 =  M_0 * M_1';
+sigma_2 = M_1 * M_2' .÷ 2;
+#sigma_3 = M_2 * M_3' .÷ 4;
+s = sum(M_2,dims=2)
+sigma_3 = (M_2 * M_3')
+sigma_3 = sigma_3 ./	s
+sigma_3 = ∂_3 .÷ 1
 
 
 
@@ -104,10 +108,15 @@ M_3_cu = cu(M_3);
 
 #CuArrays.allowscalar(false)
 
-@btime sigma_1_cu = M_0_cu * M_1_cu';
-@btime sigma_2_cu = M_1_cu * M_2_cu' .÷ 2;
-@btime sigma_3_cu = (M_2_cu * M_3_cu') .÷ 4;
+sigma_1_cu = M_0_cu * M_1_cu';
+sigma_2_cu = M_1_cu * M_2_cu' .÷ 2;
+sigma_3_cu = (M_2_cu * M_3_cu') ./ 4;
+sigma_3_cu = sigma_3_cu .÷ 1;
 
+using Test
+@test Matrix(sigma_1) == collect(sigma_1_cu)
+@test Matrix(sigma_2) == collect(sigma_2_cu)
+@test Matrix(sigma_3) == collect(sigma_3_cu)
 
 cutimes, jltimes = Float64[], Float64[]
 
@@ -151,7 +160,12 @@ end
 
 
 
-S2 = sum(sigma_3_cu,dims=2)
+s1 = collect(sigma_1_cu)
+s2 = collect(sigma_2_cu)
+s3 = collect(sigma_3_cu)
+
+
+S2 = sum(s3,dims=2)
 S2 = collect(S2)
 
 inner = [k for k=1:length(S2) if S2[k]==2]
