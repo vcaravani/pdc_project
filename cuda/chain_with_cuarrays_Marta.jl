@@ -145,7 +145,7 @@ function benchmark(n,m,k)
 
 					# compute sigma_1
 					@info("M0*M1'")
-					t1 = Base.@elapsed @btime GrB_mxm($sigma_1, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, $M_0, $M_1, $desc);
+					t1 = Base.@elapsed @time GrB_mxm(sigma_1, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_0, M_1, desc);
 					#@GxB_fprint(sigma_1, GxB_COMPLETE)
 					
 					# init sigma_2
@@ -168,7 +168,7 @@ function benchmark(n,m,k)
 					
 					@info("M1*M2'÷2 ")
 					
-					t2 = Base.@elapsed @btime $compute_s2()
+					t2 = Base.@elapsed @time compute_s2()
 
 					
 					
@@ -195,26 +195,26 @@ function benchmark(n,m,k)
 					
 					
 					@info("(M2*M3'/4)÷1")
-					t3 = Base.@elapsed @btime $compute_s3();
+					t3 = Base.@elapsed @time compute_s3();
 				
 				elseif K == K_gpu_sparse
 					try
 						@info("M0*M1'")
-						t1 = Base.@elapsed @btime CUSPARSE.gemm('N','T',$M_0,$M_1,'O','O','O');
+						t1 = Base.@elapsed @time CUSPARSE.gemm('N','T',M_0,M_1,'O','O','O');
 					catch e
 						println("Dim too big")
 					end 
 					
 					try
 						@info("M1*M2'÷2 ")
-						t2 = Base.@elapsed @btime collect((CUSPARSE.gemm('N','T',$M_1,$M_2,'O','O','O'))) .÷ 2; #divisione su cpu
+						t2 = Base.@elapsed @time collect((CUSPARSE.gemm('N','T',M_1,M_2,'O','O','O'))) .÷ 2; #divisione su cpu
 					catch e
 						println("Dim too big")
 					end
 					
 					try	
 						@info("(M1*M3'/4)÷1")
-						t3 = Base.@elapsed @btime (collect(CUSPARSE.gemm('N','T',$M_2,$M_3,'O','O','O')) ./ 4) .÷ 1;
+						t3 = Base.@elapsed @time (collect(CUSPARSE.gemm('N','T',M_2,M_3,'O','O','O')) ./ 4) .÷ 1;
 					catch e
 						println("Dim too big")
 					end 
@@ -224,11 +224,11 @@ function benchmark(n,m,k)
 					
 				else
 					@info("M0*M1'")
-					t1 = Base.@elapsed @btime $M_0 * $M_1';
+					t1 = Base.@elapsed @time M_0 * M_1';
 					@info("M1*M2'÷2 ")
-					t2 = Base.@elapsed @btime ($M_1 * $M_2') .÷ 2;
+					t2 = Base.@elapsed @time (M_1 * M_2') .÷ 2;
 					@info("(M1*M3'/4)÷1")
-					t3 = Base.@elapsed @btime (($M_2 * $M_3')  ./ 4) .÷ 1;	
+					t3 = Base.@elapsed @time ((M_2 * M_3')  ./ 4) .÷ 1;	
 					print("\n")
 				end
 
