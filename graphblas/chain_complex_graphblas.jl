@@ -84,6 +84,23 @@ function delete_0_elements_in_sigma(I,J,X)
 end
 
 
+function delete_0_elements_in_sigma_float(I,J,X)
+
+	i1,j1,x1 = [],[],Float64[]
+
+	for (i,j,x) in zip(I,J,X)
+		#print(i,j,x)
+		if x > 0
+			push!(i1,i)
+			push!(j1,j)
+			push!(x1,x)
+		else
+		end
+	end
+	return i1,j1,x1
+end
+
+
 function normalize_sigma(sigma2norm, factor)
 
 	n_row = Int64(GrB_Matrix_nrows(sigma2norm))
@@ -126,13 +143,71 @@ function normalize_sigma(sigma2norm, factor)
 
 end
 
+function normalize_sigma_float(sigma2norm, factor)
+
+	n_row = Int64(GrB_Matrix_nrows(sigma2norm))
+	n_col = Int64(GrB_Matrix_ncols(sigma2norm))
+	I1 = OneBasedIndex.([i for i=1:n_row])
+	J1 = OneBasedIndex.([j for j=1:n_col])
+
+	OUT = GrB_Matrix{Int64}()
+	GrB_Matrix_new(OUT, GrB_INT64, n_row, n_col)
+	GrB_Matrix_extract(OUT, GrB_NULL, GrB_NULL, sigma2norm, I1, n_row, J1, n_col, GrB_NULL)
+
+	I, J, X = GrB_Matrix_extractTuples(sigma2norm)
+	X_divisor = [factor for i=1:length(X)]
+	sigma_divisor = GrB_Matrix(I, J, X_divisor)
+
+	sigma0 = GrB_Matrix{Float64}()
+	GrB_Matrix_new(sigma0, GrB_FP64, n_row, n_col)
+	GrB_eWiseMult_Matrix_Semiring(sigma0, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_FP64, sigma2norm, sigma_divisor, GrB_NULL)
+
+
+	#@GxB_fprint(sigma0,GxB_COMPLETE)
+	#delete 0-elements in sigma
+	n_row = Int64(GrB_Matrix_nrows(sigma0))
+	n_col = Int64(GrB_Matrix_ncols(sigma0))
+	I1 = OneBasedIndex.([i for i=1:n_row])
+	J1 = OneBasedIndex.([j for j=1:n_col])
+
+	OUT_sigma0 = GrB_Matrix{Int64}()
+	GrB_Matrix_new(OUT_sigma0, GrB_INT64, n_row, n_col)
+	GrB_Matrix_extract(OUT_sigma0, GrB_NULL, GrB_NULL, sigma0, I1, n_row, J1, n_col, GrB_NULL)
+
+	I, J, X = GrB_Matrix_extractTuples(sigma0)
+
+	i1,j1,x1 = delete_0_elements_in_sigma_float(ZeroBasedIndex2Int(I), ZeroBasedIndex2Int(J), X)
+	#print(I, J, X )
+	print(typeof(i1))
+	sigma = GrB_Matrix(OneBasedIndex.(i1), OneBasedIndex.(j1), x1)
+
+	return sigma
+
+end
+
+
+#=
+function normalize_sigma(sigma2norm, factor)
+
+	const db2 = x -> x÷2
+
+@inline function DIV_BY_TWO(T)
+    DIV_BY_TWO_OP = GrB_UnaryOp()
+    GrB_UnaryOp_new(DIV_BY_TWO_OP, db2, GrB_type(T), GrB_type(T))
+    return DIV_BY_TWO_OP
+end
+
+	return sigma
+
+end
+=#
 
 using SuiteSparseGraphBLAS, GraphBLASInterface, Test
 GrB_init(GrB_NONBLOCKING)
 
 
 
-V,CV = Lar.cuboidGrid([30,20,1])
+V,CV = Lar.cuboidGrid([3,2,1])
 
 VV = [[v] for v=1:size(V,2)]
 FV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2FV,CV)...))))
@@ -200,8 +275,8 @@ sigma_2 = normalize_sigma(sigma_2_notbinary, factor); # sigma_2 have zeros in x
 
 
 # create M_3
-M_3_test = K(FV)
-M_3 = K_GBLAS(FV);
+M_3_test = K(CV)
+M_3 = K_GBLAS(CV);
 #@GxB_fprint(M_3, GxB_COMPLETE)
 @test M_3_test == collect_matrix_gblas(M_3)
 
@@ -216,19 +291,23 @@ sigma_3_notbinary = GrB_Matrix(ZeroBasedIndex.(I1),ZeroBasedIndex.(J1),x );
 
 # compute sigma_3
 sigma_3_test = M_2_test * M_3_test'
-sigma_3_test = sigma_3_test .÷ 4
+sigma_3_test = sigma_3_test ./ 4
+sigma_3_test = sigma_3_test .÷ 1
 
 GrB_mxm(sigma_3_notbinary, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_2, M_3, desc);
 factor = 0.25;
-sigma_3 = normalize_sigma(sigma_3_notbinary, factor); # sigma_2 have zeros in x
+sigma_3 = normalize_sigma_float(sigma_3_notbinary, factor);
+sigma_3 =  normalize_sigma(sigma_3, 1);
 @test sigma_3_test == collect_matrix_gblas(sigma_3)
 
+
+@GxB_fprint(sigma_3_notbinary, GxB_COMPLETE)
 
 s1 = collect_matrix_gblas(sigma_1)
 s2 = collect_matrix_gblas(sigma_2)
 s3 = collect_matrix_gblas(sigma_3)
 
-S2 = sum(sigma_3_test,dims=2)
+S2 = sum(s3,dims=2)
 
 
 inner = [k for k=1:length(S2) if S2[k]==2]
