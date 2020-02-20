@@ -161,8 +161,9 @@ function benchmark(n,m,k)
 					
 					function compute_s2()
 						GrB_mxm(sigma_2_notbinary, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_1, M_2, desc);
-						factor = 0.5;
-						sigma_2 = normalize_sigma(sigma_2_notbinary, factor); # sigma_2 have zeros in x
+						#factor = 0.5;
+						#sigma_2 = normalize_sigma(sigma_2_notbinary, factor); # sigma_2 have zeros in x
+						sigma_2 = intdivbyn_sigma(sigma_2_notbinary,2);
 					end
 					
 					@info("M1*M2'÷2 ")
@@ -186,12 +187,14 @@ function benchmark(n,m,k)
 					function compute_s3()
 						GrB_mxm(sigma_3_notbinary, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_2, M_3, desc);
 						factor = 1;
-						sigma_3 = normalize_sigma_float(sigma_3_notbinary, factor); 
-						sigma_3 = normalize_sigma(sigma_3, factor); # sigma_3 have zeros in x
+						#sigma_3 = normalize_sigma_float(sigma_3_notbinary, factor); 
+						#sigma_3 = normalize_sigma(sigma_3, factor); # sigma_3 have zeros in x
+						sigma_3 = floatdivbyn_sigma(sigma_3_notbinary,4)
+						sigma_3_2 = intdivbyn_sigma(sigma_3, 1)
 					end
 					
 					
-					@info("(M1*M3'/4)÷1")
+					@info("(M2*M3'/4)÷1")
 					t3 = Base.@elapsed @btime $compute_s3();
 				
 				elseif K == K_gpu_sparse
@@ -417,7 +420,41 @@ function normalize_sigma_float(sigma2norm, factor)
 
 end
 
+function intdivbyn_sigma(sigma,n)
 
+	function integer_division(a)
+    	return a ÷ n
+	end
+
+	INTDIV_BYN = GrB_UnaryOp()
+	GrB_UnaryOp_new(INTDIV_BYN, integer_division, GrB_INT64, GrB_INT64)
+
+	sigma_divbyn = GrB_Matrix{Int64}()
+	GrB_Matrix_new(sigma_divbyn, GrB_INT64, GrB_Matrix_nrows(sigma), GrB_Matrix_ncols(sigma))
+
+	GrB_Matrix_apply(sigma_divbyn, GrB_NULL, GrB_NULL, INTDIV_BYN, sigma, GrB_NULL)
+
+	return sigma_divbyn
+
+end
+
+function floatdivbyn_sigma(sigma,n)
+
+	function float_division(a)
+    	return a / n
+	end
+
+	INTDIV_BYN = GrB_UnaryOp()
+	GrB_UnaryOp_new(INTDIV_BYN, float_division, GrB_FP64, GrB_FP64)
+
+	sigma_divbyn = GrB_Matrix{Float64}()
+	GrB_Matrix_new(sigma_divbyn, GrB_FP64, GrB_Matrix_nrows(sigma), GrB_Matrix_ncols(sigma))
+
+	GrB_Matrix_apply(sigma_divbyn, GrB_NULL, GrB_NULL, INTDIV_BYN, sigma, GrB_NULL)
+
+	return sigma_divbyn
+
+end
 
 
 
