@@ -1,4 +1,4 @@
-using LinearAlgebraicRepresentation, SparseArrays, DataStructures
+using LinearAlgebraicRepresentation, SparseArrays
 Lar = LinearAlgebraicRepresentation
 
 function CV2FV( v::Array{Int64} )
@@ -185,6 +185,50 @@ function normalize_sigma_float(sigma2norm, factor)
 
 end
 
+function intdivbyn_sigma(sigma,n)
+
+	function integer_division(a)
+    	return a ÷ n
+	end
+
+	INTDIV_BYN = GrB_UnaryOp()
+	GrB_UnaryOp_new(INTDIV_BYN, integer_division, GrB_INT64, GrB_INT64)
+
+	sigma_divbyn = GrB_Matrix{Int64}()
+	GrB_Matrix_new(sigma_divbyn, GrB_INT64, GrB_Matrix_nrows(sigma), GrB_Matrix_ncols(sigma))
+
+	GrB_Matrix_apply(sigma_divbyn, GrB_NULL, GrB_NULL, INTDIV_BYN, sigma, GrB_NULL)
+
+	return sigma_divbyn
+
+end
+
+function floatdivbyn_sigma(sigma,n)
+
+	function float_division(a)
+    	return a / n
+	end
+
+	INTDIV_BYN = GrB_UnaryOp()
+	GrB_UnaryOp_new(INTDIV_BYN, float_division, GrB_FP64, GrB_FP64)
+
+	sigma_divbyn = GrB_Matrix{Float64}()
+	GrB_Matrix_new(sigma_divbyn, GrB_FP64, GrB_Matrix_nrows(sigma), GrB_Matrix_ncols(sigma))
+
+	GrB_Matrix_apply(sigma_divbyn, GrB_NULL, GrB_NULL, INTDIV_BYN, sigma, GrB_NULL)
+
+	return sigma_divbyn
+
+end
+
+
+function intdivby4_sigma3()
+
+end
+
+function intdivby1_sigma3()
+
+end
 
 #=
 function normalize_sigma(sigma2norm, factor)
@@ -247,7 +291,7 @@ GrB_mxm(sigma_1, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_0, M_1, desc);
 @test sigma_1_test == collect_matrix_gblas(sigma_1)
 
 
-# create M_1
+# create M_2
 M_2_test = K(FV)
 M_2 = K_GBLAS(FV);
 #@GxB_fprint(M_1, GxB_COMPLETE)
@@ -268,14 +312,15 @@ sigma_2_test = sigma_2_test .÷ 2
 
 GrB_mxm(sigma_2_notbinary, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_1, M_2, desc);
 factor = 0.5;
-sigma_2 = normalize_sigma(sigma_2_notbinary, factor); # sigma_2 have zeros in x
+#sigma_2 = normalize_sigma(sigma_2_notbinary, factor); # sigma_2 have zeros in x
+sigma_2 = intdivbyn_sigma(sigma_2_notbinary,2)
 @test sigma_2_test == collect_matrix_gblas(sigma_2)
 
 
 
 
 # create M_3
-M_3_test = K(CV)
+M_3_test = K(CV);
 M_3 = K_GBLAS(CV);
 #@GxB_fprint(M_3, GxB_COMPLETE)
 @test M_3_test == collect_matrix_gblas(M_3)
@@ -295,9 +340,11 @@ sigma_3_test = sigma_3_test ./ 4
 sigma_3_test = sigma_3_test .÷ 1
 
 GrB_mxm(sigma_3_notbinary, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_2, M_3, desc);
-factor = 0.25;
-sigma_3 = normalize_sigma_float(sigma_3_notbinary, factor);
-sigma_3 =  normalize_sigma(sigma_3, 1);
+#factor = 0.25;
+#sigma_3 = normalize_sigma_float(sigma_3_notbinary, factor);
+#sigma_3 =  normalize_sigma(sigma_3, 1);
+sigma_3 = floatdivbyn_sigma(sigma_3_notbinary,4)
+sigma_3 = intdivbyn_sigma(sigma_3, 1)
 @test sigma_3_test == collect_matrix_gblas(sigma_3)
 
 
