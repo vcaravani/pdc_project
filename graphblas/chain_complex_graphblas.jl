@@ -1,6 +1,9 @@
 using LinearAlgebraicRepresentation, SparseArrays
 Lar = LinearAlgebraicRepresentation
 
+using SuiteSparseGraphBLAS, GraphBLASInterface, Test
+GrB_init(GrB_NONBLOCKING)
+
 function CV2FV( v::Array{Int64} )
 	faces = [
 		[v[1], v[2], v[3], v[4]], [v[5], v[6], v[7], v[8]],
@@ -313,7 +316,7 @@ sigma_2_test = sigma_2_test .÷ 2
 GrB_mxm(sigma_2_notbinary, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_1, M_2, desc);
 factor = 0.5;
 #sigma_2 = normalize_sigma(sigma_2_notbinary, factor); # sigma_2 have zeros in x
-sigma_2 = intdivbyn_sigma(sigma_2_notbinary,2)
+sigma_2 = intdivbyn_sigma(sigma_2_notbinary,Int64(2))
 @test sigma_2_test == collect_matrix_gblas(sigma_2)
 
 
@@ -343,7 +346,7 @@ GrB_mxm(sigma_3_notbinary, GrB_NULL, GrB_NULL, GxB_PLUS_TIMES_INT64, M_2, M_3, d
 #factor = 0.25;
 #sigma_3 = normalize_sigma_float(sigma_3_notbinary, factor);
 #sigma_3 =  normalize_sigma(sigma_3, 1);
-sigma_3 = floatdivbyn_sigma(sigma_3_notbinary,4)
+sigma_3 = floatdivbyn_sigma(sigma_3_notbinary,4.0)
 sigma_3 = intdivbyn_sigma(sigma_3, 1)
 @test sigma_3_test == collect_matrix_gblas(sigma_3)
 
