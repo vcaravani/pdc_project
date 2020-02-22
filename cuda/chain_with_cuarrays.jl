@@ -180,3 +180,61 @@ GL.VIEW([ GL.GLGrid(V,FV[inner],GL.Point4d(1,1,1,1))
 
 GL.VIEW([ GL.GLGrid(V,FV[outer],GL.Point4d(1,1,1,1))
           GL.GLAxis(GL.Point3d(-1,-1,-1),GL.Point3d(1,1,1)) ]);
+
+
+
+n = 3;
+m = 2;
+k = 1;
+
+V,CV = Lar.cuboidGrid([n,m,k]);
+
+VV = [[v] for v=1:size(V,2)];
+EV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2EV,CV)...))));
+FV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2FV,CV)...))));
+
+
+M_0 = K_f(VV);
+M_1 = K_f(EV);
+M_2 = K_f(FV);
+M_3 = K_f(CV);
+
+
+
+@btime sigma_1 =  M_0 * M_1';
+@btime sigma_2 = M_1 * M_2' .÷ 2;
+@btime sigma_3 = M_2 * M_3' .÷ 4;
+
+
+
+M_0_cu = cu(M_0);
+M_1_cu = cu(M_1);
+M_2_cu = cu(M_2);
+M_3_cu = cu(M_3);
+
+#CuArrays.allowscalar(false)
+
+@btime sigma_1_cu = M_0_cu * M_1_cu';
+@btime sigma_2_cu = M_1_cu * M_2_cu' .÷ 2;
+@btime sigma_3_cu = (M_2_cu * M_3_cu') .÷ 4;
+
+
+
+M_0_cusparse = K_sparse(VV);
+M_1_cusparse = K_sparse(EV);
+M_2_cusparse = K_sparse(FV);
+M_3_cusparse = K_sparse(CV);
+
+
+@btime sigma_1_cusparse = CUSPARSE.gemm('N','T',M_0_cusparse,M_1_cusparse,'O','O','O');
+@btime sigma_2_cusparse = CUSPARSE.gemm('N','T',M_1_cusparse,M_2_cusparse,'O','O','O');
+@btime sigma_3_cusparse = CUSPARSE.gemm('N','T',M_2_cusparse,M_3_cusparse,'O','O','O');
+
+@btime sigma_2_cusparse = cu(collect((CUSPARSE.gemm('N','T',M_1_cusparse,M_2_cusparse,'O','O','O')))) .÷ 2;
+@btime sigma_3_cusparse = collect(CUSPARSE.gemm('N','T',M_2_cusparse,M_3_cusparse,'O','O','O')) .÷ 4;
+
+
+
+
+
+
