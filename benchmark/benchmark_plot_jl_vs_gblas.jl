@@ -8,19 +8,15 @@ using SparseArrays, CuArrays
 using SuiteSparseGraphBLAS, GraphBLASInterface, Test
 GrB_init(GrB_NONBLOCKING)
 
-gblastimes, jltimes, nvertex = Float64[], Float64[], Int64[]
-
-function benchmark_jl_vs_gblas(n,m,k,step_size,iteration)
-
-	sz = step_size
-	max_it = iteration
 
 
-	for i in 1:sz:max_it
-		#print([n*i,m*i,k*i])
-		V,CV = Lar.cuboidGrid([n*i,m*i,k])
+function benchmark_jl_vs_gblas(nmk)
 
-		print("n_vertex: "*string(size(V)[2]), ([n*i,m*i,k]))
+
+	for i in 1:length(nmk)
+		V,CV = Lar.cuboidGrid(nmk[i])
+
+		print("n_vertex: "*string(size(V)[2]), (nmk[i]))
 		push!(nvertex, size(V)[2])
 		print("\n\n")
 		VV = [[v] for v=1:size(V,2)]
@@ -94,8 +90,12 @@ function benchmark_jl_vs_gblas(n,m,k,step_size,iteration)
 end
 
 
-s = 5
-it = 30
+
+
+gblastimes, jltimes, nvertex = Float64[], Float64[], Int64[]
+
+nmk = [[10,5,2],[40,20,10],[80,40,20],[100,50,25],[200,100,50],[300,150,50]]
+
 benchmark_jl_vs_gblas(8,4,10,s,it)
 
 speedup = jltimes ./ gblastimes
@@ -104,7 +104,7 @@ x = nvertex
 using Plots; plotly()
 #x = repeat(ranges, inner = 1)
 Plots.scatter(
-  log2.(x), [speedup, fill(1.0, length(speedup))],
+  log.(x), [speedup, fill(1.0, length(speedup))],
   label = ["gblas" "sparse_arrays"], markersize = 4, markerstrokewidth = 1,
   legend = :right, xlabel = "vertex", ylabel = "speedup"
 )

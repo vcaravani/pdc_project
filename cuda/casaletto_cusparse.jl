@@ -60,7 +60,7 @@ function K_cusparse( CV )
 	J = vcat(CV...)
 	Vals = Float32[1 for k=1:length(I)]
 	M = sparse(I,J,Vals)
-	d_M = CuSparseMatrixCSR(CV_sparse)
+	d_M = CuSparseMatrixCSR(M)
 
 	return d_M
 end
