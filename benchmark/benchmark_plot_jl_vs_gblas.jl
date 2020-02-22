@@ -96,7 +96,7 @@ gblastimes, jltimes, nvertex = Float64[], Float64[], Int64[]
 
 nmk = [[10,5,2],[40,20,10],[80,40,20],[100,50,25],[200,100,50],[300,150,50]]
 
-benchmark_jl_vs_gblas(8,4,10,s,it)
+benchmark_jl_vs_gblas(nmk)
 
 speedup = jltimes ./ gblastimes
 x = nvertex
@@ -104,7 +104,7 @@ x = nvertex
 using Plots; plotly()
 #x = repeat(ranges, inner = 1)
 Plots.scatter(
-  log.(x), [speedup, fill(1.0, length(speedup))],
+  x, [speedup, fill(1.0, length(speedup))],
   label = ["gblas" "sparse_arrays"], markersize = 4, markerstrokewidth = 1,
   legend = :right, xlabel = "vertex", ylabel = "speedup"
 )

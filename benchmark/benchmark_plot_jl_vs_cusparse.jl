@@ -104,7 +104,7 @@ x = nvertex
 using Plots; plotly()
 #x = repeat(ranges, inner = 1)
 Plots.scatter(
-  log.(x), [speedup, fill(1.0, length(speedup))],
-  label = ["cuarrays" "sparse_arrays"], markersize = 4, markerstrokewidth = 1,
+  x, [speedup, fill(1.0, length(speedup))],
+  label = ["cusparse" "sparse_arrays"], markersize = 4, markerstrokewidth = 1,
   legend = :right, xlabel = "vertex", ylabel = "speedup"
 )
