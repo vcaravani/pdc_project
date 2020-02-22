@@ -93,7 +93,7 @@ end
 cutimes, jltimes, nvertex = Float64[], Float64[], Int64[]
 
 #nmk = [[10,5,2],[40,20,10],[80,40,20],[100,50,25],[200,100,50],[300,150,50]] #outofmemory in 40,20,10 su gtx nvidia 1060
-nmk = [[3,2,1],[10,5,1],[20,10,1], [20,10,5], [30,10,5], [40,20,10], [60,30,10]]
+nmk = [[3,2,1],[10,5,1],[20,10,1], [20,10,1], [30,10,1], [40,20,1], [60,30,1]]
 benchmark_jl_vs_cu(nmk)
 
 speedup = jltimes ./ cutimes
@@ -102,11 +102,10 @@ x = nvertex
 print(x) # per la tesla
 print(speedup) # per la tesla
 
-
 using Plots; plotly()
 #x = repeat(ranges, inner = 1)
 Plots.scatter(
-  log.(x), [speedup, fill(1.0, length(speedup))],
+  x, [speedup, fill(1.0, length(speedup))],
   label = ["cuarrays" "sparse_arrays"], markersize = 4, markerstrokewidth = 1,
   legend = :right, xlabel = "vertex", ylabel = "speedup"
 )
