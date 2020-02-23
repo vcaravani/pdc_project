@@ -65,22 +65,22 @@ function benchmark_jl_vs_cu(nmk)
 					try
 						t1 = @belapsed $M_0 * $M_1'
 					catch e
-						print("GPU out of memory: ", e)
+						print("GPU out of memory: ")
 						t1 = 10
 					end
 
 					try
-						t2 = @belapsed ($M_1 * $M_2') #.÷ 2ù
+						t2 = @belapsed ($M_1 * $M_2') #.÷ 2
 					catch e
 						t2 = 10
-						print("GPU out of memory: ", e)
+						print("GPU out of memory: ")
 					end
 					try
 						t3 = @belapsed($M_2 * $M_3')  #./ 4
 						#t3_2 = @belapsed $M_2 * $M_3')  #.÷ 1
 					catch e
 						t3 = 10
-						print("GPU out of memory: ", e)
+						print("GPU out of memory: ")
 					end
 					if K == K_cpu
 						#push!(jltimes,t1)
@@ -100,9 +100,12 @@ end
 cutimes, jltimes, nvertex = Float64[], Float64[], Int64[]
 
 #nmk = [[10,5,2],[40,20,10],[80,40,20],[100,50,25],[200,100,50],[300,150,50]] #outofmemory in 40,20,10 su gtx nvidia 1060
-nmk = [[3,2,1],[10,5,1],[20,10,1], [20,10,1], [30,10,1], [40,20,1], [60,30,1]]
+#nmk = [[3,2,1],[10,5,1],[20,10,1], [20,10,1], [30,10,1], [40,20,1], [60,30,1]]
 
-nmk = [[3,2,1],[10,5,1],[20,10,1]]
+#nmk = [[3,2,1],[10,5,2],[20,10,5],[40,20,10],[60,40,20],[80,60,20],[200,100,50]]
+nmk = [[3,2,1],[10,5,2],[15,10,2],[20,10,5],[25,15,10],[30,20,10],[40,20,10],[50,20,10]]
+
+
 benchmark_jl_vs_cu(nmk)
 
 speedup = jltimes ./ cutimes
