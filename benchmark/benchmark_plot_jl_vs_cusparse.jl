@@ -53,6 +53,9 @@ function benchmark_jl_vs_cusparse(nmk)
 		EV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2EV,CV)...))))
 		FV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2FV,CV)...))))
 
+		t1,t2,t3 = 0.0,0.0,0.0
+
+
 	    K_cpu, K_gpu = K, K_cusparse
 
 				for K in (K_cpu,K_gpu)
@@ -77,9 +80,26 @@ function benchmark_jl_vs_cusparse(nmk)
 						push!(jltimes,t1+t2+t3)
 					else
 
+				
+						try
 						t1 = @belapsed CUSPARSE.gemm('N','T',$M_0,$M_1,'O','O','O');
-						t2 = @belapsed CUSPARSE.gemm('N','T',$M_1,$M_2,'O','O','O');
-						t3 = @belapsed CUSPARSE.gemm('N','T',$M_2,$M_3,'O','O','O');
+						catch e
+							print("GPU out of memory: ", e)
+							t1 = 10
+						end
+
+						try
+							t2 = @belapsed CUSPARSE.gemm('N','T',$M_1,$M_2,'O','O','O');
+						catch e
+							t2 = 10
+							print("GPU out of memory: ", e)
+						end
+						try
+							t3 = @belapsed CUSPARSE.gemm('N','T',$M_2,$M_3,'O','O','O');
+						catch e
+							t3 = 10
+							print("GPU out of memory: ", e)
+						end
 						#push!(cutimes,t1)
 						#push!(cutimes,t2)
 						push!(cutimes,t1+t2+t3)

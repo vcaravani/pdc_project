@@ -23,6 +23,9 @@ function benchmark_jl_vs_gblas(nmk)
 		EV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2EV,CV)...))))
 		FV = convert(Array{Array{Int64,1},1}, collect(Set(vcat(map(CV2FV,CV)...))))
 
+		t1,t2,t3 = 0.0,0.0,0.0
+
+
 	    K_cpu, K_gblas = K, K_GBLAS
 
 				for K in (K_cpu,K_gblas)
